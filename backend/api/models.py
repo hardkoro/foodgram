@@ -1,28 +1,10 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models.fields.related import ForeignKey
 
 
-class User(AbstractUser):
-    """Extend User model with custom fields."""
-    email = models.EmailField(unique=True)
-
-    class Meta:
-        # Username & Email combination must be unique
-        constraints = [
-            models.UniqueConstraint(
-                fields=['username', 'email'],
-                name='one_email_one_account'
-            )
-        ]
-        ordering = ['username']
-
-    def __str__(self):
-        return self.username
-
-    def __repr__(self):
-        return self.username
+User = get_user_model()
 
 
 class Tag(models.Model):
