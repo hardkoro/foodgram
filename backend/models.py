@@ -1,8 +1,6 @@
-from django.core import validators
-from django.core.validators import MinValueValidator
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import constraints
 from django.db.models.fields.related import ForeignKey
 
 

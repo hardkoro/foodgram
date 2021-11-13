@@ -4,7 +4,7 @@ from .models import Ingredient, IngredientInRecipe, Recipe, Tag, User
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['id', 'username', 'first_name', 'last_name', 'email'] 
+    list_display = ['id', 'username', 'first_name', 'last_name', 'email']
     list_filter = ['email', 'username']
     empty_value_display = '-empty-'
 
@@ -16,7 +16,7 @@ class IngredientAdmin(admin.ModelAdmin):
 
 
 class IngredientInRecipeAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in IngredientInRecipe._meta.get_fields()]
+    list_display = [f.name for f in IngredientInRecipe._meta.get_fields()]
     empty_value_display = '-empty-'
 
 
