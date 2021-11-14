@@ -1,0 +1,1 @@
+python manage.py addingredients --file ../data/ingredients.json
