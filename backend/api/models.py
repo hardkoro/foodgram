@@ -75,7 +75,7 @@ class Recipe(models.Model):
         blank=False
     )
     image = models.ImageField(
-        upload_to='media/recipes/',
+        upload_to='recipes/',
         null=False,
         blank=False
     )
@@ -88,6 +88,7 @@ class Recipe(models.Model):
             MinValueValidator(1, 'Cooking time must be at least 1 minute!')
         ]
     )
+    tags = models.ManyToManyField(Tag)
 
     class Meta:
         ordering = ['-id']

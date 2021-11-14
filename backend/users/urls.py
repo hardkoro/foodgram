@@ -1,14 +1,16 @@
 from django.urls import include, path
-# from rest_framework.routers import DefaultRouter
+from rest_framework.routers import DefaultRouter
+
+from users.views import CustomUserViewSet, TokenAPI
 
 
-app_name = 'api'
-
-# router = DefaultRouter()
-# router.register('users', )
+router = DefaultRouter()
+router.register('users', CustomUserViewSet)
 
 urlpatterns = [
-    # path('', include('router.urls')),
-    path('', include('djoser.urls')),
-    path('auth/', include('djoser.urls.authtoken'))
+    path('', include(router.urls)),
+]
+
+urlpatterns += [
+    path('auth/token/', TokenAPI.as_view(), name='token'),
 ]
