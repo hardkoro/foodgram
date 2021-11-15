@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from users.views import CustomUserViewSet, TokenAPI
+from users.views import CustomUserViewSet
 
 
 router = DefaultRouter()
@@ -9,8 +9,4 @@ router.register('users', CustomUserViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-]
-
-urlpatterns += [
-    path('auth/token/', TokenAPI.as_view(), name='token'),
 ]

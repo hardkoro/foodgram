@@ -48,7 +48,7 @@ class Ingredient(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['name', 'measurement_unit'],
-                name='unique_ingredient_measurement_pair'
+                name='unique ingredient+measurement pair'
             )
         ]
         ordering = ['name']
@@ -89,6 +89,10 @@ class Recipe(models.Model):
         ]
     )
     tags = models.ManyToManyField(Tag)
+    ingredients = models.ManyToManyField(
+        Ingredient,
+        through='IngredientInRecipe'
+    )
 
     class Meta:
         ordering = ['-id']
@@ -107,14 +111,12 @@ class IngredientInRecipe(models.Model):
     recipe = ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='ingredients',
         blank=False,
         null=False
     )
     ingredient = ForeignKey(
         Ingredient,
         on_delete=models.DO_NOTHING,
-        related_name='used_in_recipes',
         blank=False,
         null=False
     )
@@ -131,7 +133,7 @@ class IngredientInRecipe(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['recipe', 'ingredient'],
-                name='unique_ingredient_in_recipe'
+                name='unique ingredient in recipe'
             )
         ]
         ordering = ['id']

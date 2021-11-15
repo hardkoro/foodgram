@@ -22,6 +22,7 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
         source='ingredient.measurement_unit'
     )
     id = serializers.ReadOnlyField(source='ingredient.id')
+
     class Meta:
         model = IngredientInRecipe
         fields = ('name', 'measurement_unit', 'id', 'amount')
@@ -38,19 +39,20 @@ class RecipeSerializer(serializers.ModelSerializer):
         read_only=True,
         many=True
     )
-    author = CustomUserSerializer()
-    is_favorited = serializers.BooleanField(
-        read_only=True,
-        default=False
-    )
-    is_in_shopping_cart = serializers.BooleanField(
-        read_only=True,
-        default=False
-    )
+    author = CustomUserSerializer(read_only=True)
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
     ingredients = IngredientInRecipeSerializer(
+        source='ingredientinrecipe_set',
         read_only=True,
         many=True
     )
+
+    def get_is_favorited(self, obj):
+        return False
+
+    def get_is_in_shopping_cart(self, obj):
+        return False
 
     class Meta:
         model = Recipe
