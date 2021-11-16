@@ -5,8 +5,10 @@ from .models import Ingredient, Recipe, Tag
 from .serializers import IngredientSerializer, RecipeSerializer, TagSerializer
 
 
-class CreateRetrieveListViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
-                                mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+class CreateRetrieveListViewSet(
+    mixins.CreateModelMixin, mixins.ListModelMixin,
+    mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
     pass
 
 
