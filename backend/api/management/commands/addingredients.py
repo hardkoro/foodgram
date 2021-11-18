@@ -5,12 +5,11 @@ from django.core.management.base import BaseCommand, CommandError
 
 from api.models import Ingredient
 
+FILE_NAME = '../data/ingredients.json'
+
 
 class Command(BaseCommand):
-    help = 'Populates DB with ingredients data from specified JSON file'
-
-    def add_arguments(self, parser):
-        parser.add_argument('--file', type=argparse.FileType('r'))
+    help = 'Populates DB with ingredients data from JSON file'
 
     def add_ingredients(self, data):
         [
@@ -21,9 +20,9 @@ class Command(BaseCommand):
         ]
 
     def handle(self, *args, **options):
-        for data in options['file']:
+        with open(FILE_NAME, 'r', encoding='utf-8') as file:
             try:
-                self.add_ingredients(json.loads(data))
+                self.add_ingredients(json.load(file))
             except Exception as e:
                 raise CommandError(f'Population failed: {str(e)[:100]}')
 

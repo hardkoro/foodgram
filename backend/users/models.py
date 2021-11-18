@@ -51,12 +51,12 @@ class Follow(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'author'],
-                name='unique_follow'
+                name='unique User to Follow'
             )
         ]
 
     def __str__(self):
-        f'User {self.user} is following {self.author}'
+        return f'User {self.user} is following {self.author}'
 
     def __repr__(self):
-        f'User {self.user} is following {self.author}'
+        return f'User {self.user} is following {self.author}'

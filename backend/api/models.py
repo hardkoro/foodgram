@@ -47,7 +47,7 @@ class Ingredient(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['name', 'measurement_unit'],
-                name='unique ingredient+measurement pair'
+                name='unique ingredient & measurement pair'
             )
         ]
         ordering = ['name']
@@ -128,11 +128,10 @@ class IngredientInRecipe(models.Model):
     )
 
     class Meta:
-        # Ingredient & Measurement combination must be unique
         constraints = [
             models.UniqueConstraint(
                 fields=['recipe', 'ingredient'],
-                name='unique ingredient in recipe'
+                name='unique Ingredient in Recipe'
             )
         ]
         ordering = ['id']
@@ -142,3 +141,63 @@ class IngredientInRecipe(models.Model):
 
     def __repr__(self):
         return f'{self.recipe}: {self.ingredient} {self.amount}'
+
+
+class RecipeFavorite(models.Model):
+    """
+    Model to store favorited by User Recipe objects
+    """
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='favorites'
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique Recipe in favorites'
+            )
+        ]
+        ordering = ['-id']
+
+    def __str__(self):
+        return f'{self.user}: {self.recipe__name}'
+
+    def __repr__(self):
+        return f'{self.user}: {self.recipe__name}'
+
+
+class RecipeInCart(models.Model):
+    """
+    Model to store Recipe objects added by User to Cart
+    """
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='in_cart'
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique Recipe in cart'
+            )
+        ]
+        ordering = ['-id']
+
+    def __str__(self):
+        return f'{self.user}: {self.recipe__name}'
+
+    def __repr__(self):
+        return f'{self.user}: {self.recipe__name}'
