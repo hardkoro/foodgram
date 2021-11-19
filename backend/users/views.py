@@ -7,40 +7,56 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api.pagination import LimitPageNumberPagination
+from api.serializers import FollowSerializer
 from users.models import Follow
-from users.serializers import CustomUserSerializer, FollowSerializer
 
 User = get_user_model()
 
+ERROR_SUBSCRIPTION_TO_SELF = 'Can\'t subscribe to self!'
+ERROR_SUBSCRIPTION_TWICE = 'Can\'t subscribe to the same author twice!'
+ERROR_NO_SUBSCRIPTION = 'Can\'t unsubscribe author because it is not in subscriptions!'
+
 
 class CustomUserViewSet(UserViewSet):
-    queryset = User.objects.all()
-    serializer_class = CustomUserSerializer
     pagination_class = LimitPageNumberPagination
 
-    @action(methods=['GET', 'DELETE'], detail=True)
+    @action(methods=['GET', 'DELETE'], detail=True, permission_classes=[IsAuthenticated])
     def subscribe(self, request, id):
-        author = get_object_or_404(User, id=id)
-        if request.method == 'DELETE':
-            get_object_or_404(
-                Follow, user=request.user, author__id=id
-            ).delete()
-            return Response(
-                data=f'{request.user} unfollowed {request.author}',
-                status=status.HTTP_204_NO_CONTENT
+        user, author = request.user, get_object_or_404(User, id=id)
+
+        if request.method == 'GET':
+            if user == author:
+                return Response(
+                    data={
+                        'errors': ERROR_SUBSCRIPTION_TO_SELF
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            if Follow.objects.filter(user=user, author=author).exists():
+                return Response(
+                    data={
+                        'errors': ERROR_SUBSCRIPTION_TWICE
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            follow = Follow.objects.create(user=user, author=author)
+            serializer = FollowSerializer(
+                follow, context={'request': request}
             )
-        serializer = FollowSerializer(
-            data={
-                'user': request.user.id,
-                'author': author
-            }
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save(user=request.user)
-        return Response(
-            data=serializer.data,
-            status=status.HTTP_201_CREATED
-        )
+            return Response(
+                data=serializer.data,
+                status=status.HTTP_201_CREATED
+            )
+        follow = Follow.objects.filter(user=user, author=author)
+        if not follow:
+            return Response(
+                data={
+                    'errors': ERROR_NO_SUBSCRIPTION
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        follow.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=['GET'], detail=False, permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
