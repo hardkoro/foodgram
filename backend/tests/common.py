@@ -2,8 +2,6 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from tests.fixtures.fixture_users import admin
-
 
 def create_users_api(admin_client):
     data = {
@@ -90,8 +88,30 @@ def create_recipes(admin_client):
     ingredients = create_ingredients(admin_client)
     result = []
     data = {
-        'name': 'Egg',
-        'measurement_unit': 'pc',
+        'ingredients': [
+            {"id": ingredients[0], "amount": 1},
+            {"id": ingredients[2], "amount": 60},
+            {"id": ingredients[3], "amount": 1}, 
+        ],
+        'tags': [tags[0]['slug'], tags[1]['slug'], ],
+        'image': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==',
+        'name': 'Banana pancakes',
+        'text': 'test text for the first Recipe',
+        'cooking_time': '30',
+    }
+    response = admin_client.post('/api/recipes/', data=data)
+    data['id'] = response.json()['id']
+    result.append(data)
+    data = {
+        'ingredients': [
+            {"id": ingredients[1], "amount": 200},
+            {"id": ingredients[3], "amount": 1}, 
+        ],
+        'tags': [tags[0]['slug'], tags[2]['slug'], ],
+        'image': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==',
+        'name': 'Banana milk',
+        'text': 'test text for the secound Recipe',
+        'cooking_time': '10',
     }
     response = admin_client.post('/api/recipes/', data=data)
     data['id'] = response.json()['id']

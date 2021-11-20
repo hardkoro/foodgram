@@ -1,3 +1,12 @@
 echo "from api.models import User; User.objects.create_superuser('admin', 'admin@example.com', '123')" | python manage.py shell
 
 python manage.py addingredients
+
+
+TDL:
+* При публикации рецепта фронтенд кодирует картинку в строку base64;
+на бэкенде её необходимо декодировать и сохранить как файл.
+Для этого будет удобно создать кастомный тип поля для картинки,
+переопределив метод сериализатора to_internal_value.
+* Для сохранения ингредиентов и тегов рецепта потребуется переопределить
+методы create и update в ModelSerializer.
