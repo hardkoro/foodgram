@@ -4,7 +4,6 @@ from rest_framework.filters import SearchFilter
 
 from .models import Recipe
 
-
 User = get_user_model()
 
 

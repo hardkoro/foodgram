@@ -1,15 +1,14 @@
-from rest_framework import serializers, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from rest_framework import status
 
 from .filters import IngredientNameFilter, RecipeAuthorAndTagFilter
 from .models import Ingredient, Recipe, RecipeFavorite, RecipeInCart, Tag
 from .pagination import LimitPageNumberPagination
 from .permissions import IsAdminOrAuthorOrReadOnly, IsAdminOrReadOnly
-from .serializers import IngredientSerializer, RecipeSerializer, RecipeShortSerializer, TagSerializer
-
+from .serializers import (IngredientSerializer, RecipeSerializer,
+                          RecipeShortSerializer, TagSerializer)
 
 ERROR_OBJECT_EXISTS = 'Can\'t add recipe to {model_name} twice!'
 ERROR_NO_OBJECT = (
