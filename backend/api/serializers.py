@@ -1,3 +1,5 @@
+import webcolors
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers, validators
 
 from users.models import Follow
@@ -6,7 +8,23 @@ from users.serializers import CustomUserSerializer
 from .models import Ingredient, IngredientInRecipe, Recipe, Tag
 
 
+class Hex2NameColor(serializers.Field):
+    """Color encoding custom field."""
+
+    def to_representation(self, value):
+        return value
+
+    def to_internal_value(self, data):
+        try:
+            data = webcolors.hex_to_name(data)
+        except ValueError:
+            raise serializers.ValidationError('No name for this color!')
+        return data
+
+
 class TagSerializer(serializers.ModelSerializer):
+    color = Hex2NameColor()
+
     class Meta:
         model = Tag
         fields = ('name', 'id', 'color', 'slug')
@@ -42,31 +60,42 @@ class RecipeSerializer(serializers.ModelSerializer):
         many=True
     )
     author = CustomUserSerializer(read_only=True)
-    # is_favorited = serializers.SerializerMethodField()
-    # is_in_shopping_cart = serializers.SerializerMethodField()
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
+    image = Base64ImageField()
     ingredients = IngredientInRecipeSerializer(
         source='ingredientinrecipe_set',
         read_only=True,
         many=True
     )
 
-    # def get_is_favorited(self, obj):
-    #     user = self.context['request'].user
-    #     if user.is_anonymous():
-    #         return False
-    #     return Recipe.objects.filter(favorites__user=user, id=obj.id).exists()
+    def get_is_favorited(self, obj):
+        user = self.context['request'].user
+        if user.is_anonymous:
+            return False
+        return Recipe.objects.filter(favorites__user=user, id=obj.id).exists()
 
-    # def get_is_in_shopping_cart(self, obj):
-    #     user = self.context['request'].user
-    #     if user.is_anonymous():
-    #         return False
-    #     return Recipe.objects.filter(cart__user=user, id=obj.id).exists()
+    def get_is_in_shopping_cart(self, obj):
+        user = self.context['request'].user
+        if user.is_anonymous:
+            return False
+        return Recipe.objects.filter(in_cart__user=user, id=obj.id).exists()
 
     class Meta:
         model = Recipe
         fields = (
-            'tags', 'author', # 'is_favorited', 'is_in_shopping_cart',
+            'tags', 'author', 'is_favorited', 'is_in_shopping_cart',
             'name', 'image', 'text', 'cooking_time', 'id', 'ingredients'
+        )
+
+
+class RecipeShortSerializer(serializers.ModelSerializer):
+    """Short bersion of Recipe serializer for Follow creation response."""
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'id', 'name', 'image', 'cooking_time'
         )
 
 
@@ -88,12 +117,15 @@ class FollowSerializer(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        return True
+        return Follow.objects.filter(user=obj.user, author=obj.author).exists()
 
     def get_recipes(self, obj):
+        request = self.context['request']
+        limit = request.GET.get('recipes_limit')
         queryset = Recipe.objects.filter(author=obj.author)
-        print(obj, obj.author, queryset)
-        return RecipeSerializer(queryset, many=True).data
+        if limit:
+            queryset = queryset[:int(limit)]
+        return RecipeShortSerializer(queryset, many=True).data
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj.author).count()

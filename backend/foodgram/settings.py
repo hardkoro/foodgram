@@ -127,9 +127,25 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ],
+
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication'
     ],
 }
 
-AUTH_USER_MODEL = 'users.User'
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    # 'HIDE_USERS': False,
+    'SERIALIZERS': {
+        'user_create': 'users.serializers.CustomUserCreateSerializer',
+        'user': 'users.serializers.CustomUserSerializer',
+        'current_user': 'users.serializers.CustomUserSerializer',
+    },
+    # 'PERMISSIONS': {
+    #     'user': ('rest_framework.permissions.IsAuthenticated',),
+    #     'user_list': ('rest_framework.permissions.AllowAny',)
+    # }
+}

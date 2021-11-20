@@ -13,16 +13,22 @@ from users.models import Follow
 User = get_user_model()
 
 ERROR_SUBSCRIPTION_TO_SELF = 'Can\'t subscribe to self!'
-ERROR_SUBSCRIPTION_TWICE = 'Can\'t subscribe to the same author twice!'
-ERROR_NO_SUBSCRIPTION = 'Can\'t unsubscribe author because it is not in subscriptions!'
+ERROR_SUBSCRIPTION_EXISTS = 'Can\'t subscribe to the same author twice!'
+ERROR_NO_SUBSCRIPTION = (
+    'Can\'t unsubscribe author because it is not in subscriptions!'
+)
 
 
 class CustomUserViewSet(UserViewSet):
     pagination_class = LimitPageNumberPagination
 
-    @action(methods=['GET', 'DELETE'], detail=True, permission_classes=[IsAuthenticated])
+    @action(
+        methods=['GET', 'DELETE'], detail=True,
+        permission_classes=[IsAuthenticated]
+    )
     def subscribe(self, request, id):
         user, author = request.user, get_object_or_404(User, id=id)
+        follow = Follow.objects.filter(user=user, author=author)
 
         if request.method == 'GET':
             if user == author:
@@ -32,10 +38,10 @@ class CustomUserViewSet(UserViewSet):
                     },
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            if Follow.objects.filter(user=user, author=author).exists():
+            if follow.exists():
                 return Response(
                     data={
-                        'errors': ERROR_SUBSCRIPTION_TWICE
+                        'errors': ERROR_SUBSCRIPTION_EXISTS
                     },
                     status=status.HTTP_400_BAD_REQUEST
                 )
@@ -47,7 +53,6 @@ class CustomUserViewSet(UserViewSet):
                 data=serializer.data,
                 status=status.HTTP_201_CREATED
             )
-        follow = Follow.objects.filter(user=user, author=author)
         if not follow:
             return Response(
                 data={
@@ -58,7 +63,10 @@ class CustomUserViewSet(UserViewSet):
         follow.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(methods=['GET'], detail=False, permission_classes=[IsAuthenticated])
+    @action(
+        methods=['GET'], detail=False,
+        permission_classes=[IsAuthenticated]
+    )
     def subscriptions(self, request):
         user = request.user
         queryset = Follow.objects.filter(user=user)

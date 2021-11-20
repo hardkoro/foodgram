@@ -21,7 +21,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
 
 class TagAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in Tag._meta.get_fields()]
+    list_display = ['name', 'color', 'slug']
     list_filter = ['name']
     empty_value_display = '-empty-'
 

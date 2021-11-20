@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models.fields.related import ForeignKey
+from django.utils.text import slugify
 
 User = get_user_model()
 
@@ -14,6 +15,11 @@ class Tag(models.Model):
     name = models.CharField(unique=True, max_length=200)
     color = models.CharField(unique=True, max_length=7)
     slug = models.SlugField(unique=True, max_length=200)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super(Tag, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ['-id']
@@ -43,7 +49,6 @@ class Ingredient(models.Model):
     )
 
     class Meta:
-        # Ingredient & Measurement combination must be unique
         constraints = [
             models.UniqueConstraint(
                 fields=['name', 'measurement_unit'],
