@@ -5,7 +5,8 @@ from rest_framework.response import Response
 
 from .exports import export_shopping_list_to_pdf
 from .filters import IngredientNameFilter, RecipeAuthorAndTagFilter
-from .models import Ingredient, IngredientInRecipe, Recipe, RecipeFavorite, RecipeInCart, Tag
+from .models import (Ingredient, IngredientInRecipe, Recipe, RecipeFavorite,
+                     RecipeInCart, Tag)
 from .pagination import LimitPageNumberPagination
 from .permissions import IsAdminOrAuthorOrReadOnly, IsAdminOrReadOnly
 from .serializers import (IngredientSerializer, RecipeSerializer,

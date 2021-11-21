@@ -1,13 +1,12 @@
-from rest_framework.generics import get_object_or_404
 import webcolors
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers, validators
+from rest_framework.generics import get_object_or_404
 
 from users.models import Follow
 from users.serializers import CustomUserSerializer
 
 from .models import Ingredient, IngredientInRecipe, Recipe, Tag
-
 
 NO_INGREDIENTS_ERROR = 'Can\'t add Recipe without Ingredients!'
 INGREDIENT_EXISTS = 'Can\'t add the same Ingredient twice!'

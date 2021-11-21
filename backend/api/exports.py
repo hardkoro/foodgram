@@ -1,9 +1,9 @@
 from io import BytesIO
+
 from django.http.response import FileResponse
-from reportlab.pdfgen import canvas
 from reportlab.pdfbase.pdfmetrics import registerFont
 from reportlab.pdfbase.ttfonts import TTFont
-
+from reportlab.pdfgen import canvas
 
 FILE_NAME = 'shopping_cart.pdf'
 FILE_HEADER = 'Shopping List'
