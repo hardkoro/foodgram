@@ -64,7 +64,6 @@ jobs:
           script: |
             sudo docker stop $(sudo docker ps -a -q)
             sudo docker system prune --force
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:latest
             sudo docker-compose stop
             sudo docker-compose rm backend
