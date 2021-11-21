@@ -172,10 +172,10 @@ class RecipeFavorite(models.Model):
         ordering = ['-id']
 
     def __str__(self):
-        return f'{self.user}: {self.recipe__name}'
+        return f'{self.user}: {self.recipe.name}'
 
     def __repr__(self):
-        return f'{self.user}: {self.recipe__name}'
+        return f'{self.user}: {self.recipe.name}'
 
 
 class RecipeInCart(models.Model):
@@ -202,7 +202,7 @@ class RecipeInCart(models.Model):
         ordering = ['-id']
 
     def __str__(self):
-        return f'{self.user}: {self.recipe__name}'
+        return f'{self.user}: {self.recipe.name}'
 
     def __repr__(self):
-        return f'{self.user}: {self.recipe__name}'
+        return f'{self.user}: {self.recipe.name}'

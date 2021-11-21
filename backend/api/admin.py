@@ -1,32 +1,35 @@
 from django.contrib import admin
 
-from .models import Ingredient, IngredientInRecipe, Recipe, Tag
+from .models import Ingredient, IngredientInRecipe, Recipe, RecipeFavorite, RecipeInCart, Tag
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ['name', 'measurement_unit']
+    list_display = ['id', 'name', 'measurement_unit']
     list_filter = ['name']
-    empty_value_display = '-empty-'
 
 
 class IngredientInRecipeAdmin(admin.ModelAdmin):
     list_display = [f.name for f in IngredientInRecipe._meta.get_fields()]
-    empty_value_display = '-empty-'
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    exclude = ['ingredients']
+    exclude = ['id', 'ingredients']
     list_filter = ['author', 'name']
-    empty_value_display = '-empty-'
 
 
 class TagAdmin(admin.ModelAdmin):
-    list_display = ['name', 'color', 'slug']
+    list_display = ['id', 'name', 'color', 'slug']
     list_filter = ['name']
-    empty_value_display = '-empty-'
+
+
+class RecipeSubModelAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'recipe']
+    list_filter = ['user']
 
 
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(IngredientInRecipe, IngredientInRecipeAdmin)
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Tag, TagAdmin)
+admin.site.register(RecipeFavorite, RecipeSubModelAdmin)
+admin.site.register(RecipeInCart, RecipeSubModelAdmin)

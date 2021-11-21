@@ -3,8 +3,9 @@ from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
+from .exports import export_shopping_list_to_pdf
 from .filters import IngredientNameFilter, RecipeAuthorAndTagFilter
-from .models import Ingredient, Recipe, RecipeFavorite, RecipeInCart, Tag
+from .models import Ingredient, IngredientInRecipe, Recipe, RecipeFavorite, RecipeInCart, Tag
 from .pagination import LimitPageNumberPagination
 from .permissions import IsAdminOrAuthorOrReadOnly, IsAdminOrReadOnly
 from .serializers import (IngredientSerializer, RecipeSerializer,
@@ -35,7 +36,24 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=False)
     def download_shopping_cart(self, request):
-        pass
+        shopping_cart = {}
+        ingredients = IngredientInRecipe.objects.filter(
+            recipe__in_cart__user=request.user
+        ).values_list(
+            'ingredient__name',
+            'ingredient__measurement_unit',
+            'amount'
+        ).order_by('ingredient__name')
+        for ingredient in ingredients:
+            name = ingredient[0]
+            if name in shopping_cart:
+                shopping_cart[name]['amount'] += ingredient[2]
+            else:
+                shopping_cart[name] = {
+                    'measurement_unit': ingredient[1],
+                    'amount': ingredient[2]
+                }
+        return export_shopping_list_to_pdf(shopping_cart)
 
     @action(methods=['GET', 'DELETE'], detail=True)
     def shopping_cart(self, request, pk):
