@@ -1,10 +1,9 @@
-import webcolors
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers, validators
 from rest_framework.generics import get_object_or_404
-
 from users.models import Follow
 from users.serializers import CustomUserSerializer
+from webcolors import hex_to_name
 
 from .models import Ingredient, IngredientInRecipe, Recipe, Tag
 
@@ -20,10 +19,9 @@ class Hex2NameColor(serializers.Field):
 
     def to_internal_value(self, data):
         try:
-            data = webcolors.hex_to_name(data)
+            return hex_to_name(data)
         except ValueError:
             raise serializers.ValidationError('No name for this color!')
-        return data
 
 
 class TagSerializer(serializers.ModelSerializer):

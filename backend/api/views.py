@@ -75,25 +75,25 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAdminOrReadOnly, )
 
 
-def get_or_delete_recipe_submodel_object(Model, request, pk):
+def get_or_delete_recipe_submodel_object(model, request, pk):
     """
     GET or DELETE requests handlers for Recipe sub-model Model
     (e.g. RecipeFavorite or RecipeInCart)
     """
     user, recipe = request.user, get_object_or_404(Recipe, pk=pk)
-    object = Model.objects.filter(user=user, recipe=recipe)
+    object = model.objects.filter(user=user, recipe=recipe)
 
     if request.method == 'GET':
         if object.exists():
             return Response(
                 data={
                     'errors': ERROR_OBJECT_EXISTS.format(
-                        model_name=Model.__name__
+                        model_name=model.__name__
                     )
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        object = Model.objects.create(user=user, recipe=recipe)
+        object = model.objects.create(user=user, recipe=recipe)
         serializer = RecipeShortSerializer(
             recipe, context={'request': request}
         )
@@ -105,7 +105,7 @@ def get_or_delete_recipe_submodel_object(Model, request, pk):
         return Response(
             data={
                 'errors': ERROR_NO_OBJECT.format(
-                    model_name=Model.__name__
+                    model_name=model.__name__
                 )
             },
             status=status.HTTP_400_BAD_REQUEST

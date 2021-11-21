@@ -1,8 +1,7 @@
-import json
-
-from django.core.management.base import BaseCommand, CommandError
+from json import load
 
 from api.models import Ingredient
+from django.core.management.base import BaseCommand, CommandError
 
 FILE_NAME = '../data/ingredients.json'
 
@@ -21,7 +20,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         with open(FILE_NAME, 'r', encoding='utf-8') as file:
             try:
-                self.add_ingredients(json.load(file))
+                self.add_ingredients(load(file))
             except Exception as e:
                 raise CommandError(f'Population failed: {str(e)[:100]}')
 
