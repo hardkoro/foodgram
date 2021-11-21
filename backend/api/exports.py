@@ -22,7 +22,7 @@ def export_shopping_list_to_pdf(data):
     for i, (item, data) in enumerate(data.items(), 1):
         pdf.drawString(
             50, item_start_height - 20 * i,
-            f"{i}. {item}: {data['amount']} {data['measurement_unit']}"
+            f"• {item} ({data['measurement_unit']}) — {data['amount']}"
         )
     pdf.showPage()
     pdf.save()
