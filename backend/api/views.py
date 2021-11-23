@@ -5,7 +5,6 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .exports import export_shopping_list_to_pdf
 from .filters import IngredientNameSearchFilter, RecipeAuthorAndTagFilter
 from .models import (Ingredient, IngredientInRecipe, Recipe, RecipeFavorite,
                      RecipeInCart, Tag)
