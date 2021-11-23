@@ -5,6 +5,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from .exports import export_shopping_list_to_pdf
 from .filters import IngredientNameSearchFilter, RecipeAuthorAndTagFilter
 from .models import (Ingredient, IngredientInRecipe, Recipe, RecipeFavorite,
                      RecipeInCart, Tag)
@@ -17,7 +18,6 @@ ERROR_OBJECT_EXISTS = 'Can\'t add recipe to {model_name} twice!'
 ERROR_NO_OBJECT = (
     'Can\'t remove recipe from {model_name} because it is not in {model_name}!'
 )
-FILE_NAME = 'shopping_cart.pdf'
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -60,9 +60,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     'measurement_unit': ingredient[1],
                     'amount': ingredient[2]
                 }
-        response = HttpResponse(shopping_cart, 'Content-Type: application/pdf')
-        response['Content-Disposition'] = f'attachment; filename={FILE_NAME}'
-        return response
+        return export_shopping_list_to_pdf(shopping_cart)
 
     @action(
         methods=['GET', 'DELETE'], detail=True,

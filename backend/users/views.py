@@ -1,4 +1,5 @@
 from api.pagination import LimitPageNumberPagination
+from api.permissions import IsAdminOrReadOnly
 from api.serializers import FollowSerializer
 from django.contrib.auth import get_user_model
 from djoser.views import UserViewSet
@@ -19,6 +20,7 @@ ERROR_NO_SUBSCRIPTION = (
 
 
 class CustomUserViewSet(UserViewSet):
+    permission_classes = (IsAdminOrReadOnly, )
     pagination_class = LimitPageNumberPagination
 
     @action(
