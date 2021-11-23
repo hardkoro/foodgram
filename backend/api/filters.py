@@ -7,8 +7,8 @@ from .models import Recipe
 User = get_user_model()
 
 
-class IngredientNameFilter(SearchFilter):
-    search_param = ('name', )
+class IngredientNameSearchFilter(SearchFilter):
+    search_param = 'name'
 
 
 class RecipeAuthorAndTagFilter(FilterSet):

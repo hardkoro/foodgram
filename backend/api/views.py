@@ -1,10 +1,12 @@
+from django.http.response import HttpResponse
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .exports import export_shopping_list_to_pdf
-from .filters import IngredientNameFilter, RecipeAuthorAndTagFilter
+from .filters import IngredientNameSearchFilter, RecipeAuthorAndTagFilter
 from .models import (Ingredient, IngredientInRecipe, Recipe, RecipeFavorite,
                      RecipeInCart, Tag)
 from .pagination import LimitPageNumberPagination
@@ -16,13 +18,15 @@ ERROR_OBJECT_EXISTS = 'Can\'t add recipe to {model_name} twice!'
 ERROR_NO_OBJECT = (
     'Can\'t remove recipe from {model_name} because it is not in {model_name}!'
 )
+FILE_NAME = 'shopping_cart.pdf'
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (IsAdminOrReadOnly, )
-    filter_class = IngredientNameFilter
+    filter_backends = (IngredientNameSearchFilter, )
+    search_fields = ('name', )
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -35,7 +39,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    @action(detail=False)
+    @action(
+        methods=['GET'], detail=False,
+        permissions=[IsAuthenticated]
+    )
     def download_shopping_cart(self, request):
         shopping_cart = {}
         ingredients = IngredientInRecipe.objects.filter(
@@ -54,15 +61,23 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     'measurement_unit': ingredient[1],
                     'amount': ingredient[2]
                 }
-        return export_shopping_list_to_pdf(shopping_cart)
+        response = HttpResponse(shopping_cart, 'Content-Type: application/pdf')
+        response['Content-Disposition'] = f'attachment; filename={FILE_NAME}'
+        return response
 
-    @action(methods=['GET', 'DELETE'], detail=True)
+    @action(
+        methods=['GET', 'DELETE'], detail=True,
+        permissions=[IsAuthenticated]
+    )
     def shopping_cart(self, request, pk):
         return get_or_delete_recipe_submodel_object(
             RecipeInCart, request, pk
         )
 
-    @action(methods=['GET', 'DELETE'], detail=True)
+    @action(
+        methods=['GET', 'DELETE'], detail=True,
+        permissions=[IsAuthenticated]
+    )
     def favorite(self, request, pk):
         return get_or_delete_recipe_submodel_object(
             RecipeFavorite, request, pk
