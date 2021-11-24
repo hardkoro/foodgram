@@ -2,11 +2,10 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers, validators
 from rest_framework.generics import get_object_or_404
 
+from api.fields import Hex2NameColor
+from api.models import Ingredient, IngredientInRecipe, Recipe, Tag
 from users.models import Follow
 from users.serializers import CustomUserSerializer
-
-from .fields import Hex2NameColor
-from .models import Ingredient, IngredientInRecipe, Recipe, Tag
 
 NO_INGREDIENTS_ERROR = 'Can\'t add Recipe without Ingredients!'
 INGREDIENT_EXISTS = 'Can\'t add the same Ingredient twice!'
@@ -147,9 +146,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.tags.clear()
         tags = self.initial_data.get('tags')
         instance.tags.set(tags)
-        super().update()
-        instance.save()
-        return instance
+        return super().update(instance, validated_data)
 
 
 class RecipeShortSerializer(serializers.ModelSerializer):
