@@ -1,27 +1,18 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers, validators
 from rest_framework.generics import get_object_or_404
+
 from users.models import Follow
 from users.serializers import CustomUserSerializer
-from webcolors import hex_to_name
 
+from .fields import Hex2NameColor
 from .models import Ingredient, IngredientInRecipe, Recipe, Tag
 
 NO_INGREDIENTS_ERROR = 'Can\'t add Recipe without Ingredients!'
 INGREDIENT_EXISTS = 'Can\'t add the same Ingredient twice!'
-
-
-class Hex2NameColor(serializers.Field):
-    """Color encoding custom field."""
-
-    def to_representation(self, value):
-        return value
-
-    def to_internal_value(self, data):
-        try:
-            return hex_to_name(data)
-        except ValueError:
-            raise serializers.ValidationError('No name for this color!')
+WRONG_INGREDIENT_AMOUNT = 'Ingredient amount must be greater than zero!'
+TAG_EXISTS = 'Can\'t add the same Tag twice!'
+WRONG_COOKING_TIME = 'Cooking time must be greater than zero!'
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -106,8 +97,30 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     {'ingredients': INGREDIENT_EXISTS}
                 )
+            if not int(ingredient['amount'] > 0):
+                raise serializers.ValidationError(
+                    {'ingredients': WRONG_INGREDIENT_AMOUNT}
+                )
             valid_ingredients.append(ingredient)
         attrs['ingredients'] = ingredients
+
+        tags = self.initial_data.get('tags')
+        valid_tags = []
+        for tag in tags:
+            if tag in valid_tags:
+                raise serializers.ValidationError(
+                    {'tags': TAG_EXISTS}
+                )
+            valid_tags.append(tag)
+        attrs['tags'] = tags
+
+        cooking_time = self.initial_data.get('cooking_time')
+        if not (int(cooking_time) > 0):
+            raise serializers.ValidationError(
+                {'cooking_time': WRONG_COOKING_TIME}
+            )
+        attrs['cooking_time'] = cooking_time
+
         return attrs
 
     def add_ingredients(self, recipe, ingredients):
@@ -128,18 +141,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        IngredientInRecipe.objects.filter(recipe=instance).all().delete()
+        IngredientInRecipe.objects.filter(recipe=instance).delete()
         ingredients = validated_data.get('ingredients')
         self.add_ingredients(instance, ingredients)
         instance.tags.clear()
         tags = self.initial_data.get('tags')
         instance.tags.set(tags)
-        instance.image = validated_data.get('image', instance.image)
-        instance.name = validated_data.get('name', instance.name)
-        instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get(
-            'cooking_time', instance.cooking_time
-        )
+        super().update()
         instance.save()
         return instance
 

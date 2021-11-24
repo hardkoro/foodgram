@@ -8,12 +8,14 @@ class Follow(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='follower'
+        related_name='follower',
+        verbose_name='follower'
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='following'
+        related_name='following',
+        verbose_name='following'
     )
 
     class Meta:
@@ -24,6 +26,8 @@ class Follow(models.Model):
                 name='unique User to Follow'
             )
         ]
+        verbose_name = 'Follower'
+        verbose_name_plural = 'Followers'
 
     def __str__(self):
         return f'User {self.user} is following {self.author}'

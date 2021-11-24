@@ -12,17 +12,19 @@ class Tag(models.Model):
     Model to tag Recipe objects.
     Each Recipe object may be tagged with multiple Tags.
     """
-    name = models.CharField(unique=True, max_length=200)
-    color = models.CharField(unique=True, max_length=7)
-    slug = models.SlugField(unique=True, max_length=200)
+    name = models.CharField(unique=True, max_length=200, verbose_name='name')
+    color = models.CharField(unique=True, max_length=7, verbose_name='color')
+    slug = models.SlugField(unique=True, max_length=200, verbose_name='slug')
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
-        super(Tag, self).save(*args, **kwargs)
+        super()
 
     class Meta:
         ordering = ['-id']
+        verbose_name = 'Tag'
+        verbose_name_plural = 'Tags'
 
     def __str__(self):
         return self.name
@@ -36,16 +38,10 @@ class Ingredient(models.Model):
     Model of Ingredients. May contain multiple records of one component
     but with different measurement units, e.g. "potato, kg" & "potato, pc"
     """
-    name = models.CharField(
-        null=False,
-        blank=False,
-        db_index=True,
-        max_length=200
-    )
+    name = models.CharField(db_index=True, max_length=200, verbose_name='name')
     measurement_unit = models.CharField(
-        null=False,
-        blank=False,
-        max_length=200
+        max_length=200,
+        verbose_name='measure_unit'
     )
 
     class Meta:
@@ -56,6 +52,8 @@ class Ingredient(models.Model):
             )
         ]
         ordering = ['name']
+        verbose_name = 'Ingredient'
+        verbose_name_plural = 'Ingredients'
 
     def __str__(self):
         return f'{self.name}, {self.measurement_unit}'
@@ -70,36 +68,29 @@ class Recipe(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='recipes',
-        null=False,
-        blank=False
+        verbose_name='author'
     )
-    name = models.CharField(
-        max_length=200,
-        null=False,
-        blank=False
-    )
-    image = models.ImageField(
-        upload_to='recipes/',
-        null=False,
-        blank=False
-    )
-    text = models.TextField(null=False, blank=False)
+    name = models.CharField(max_length=200, verbose_name='name')
+    image = models.ImageField(upload_to='recipes/', verbose_name='image')
+    text = models.TextField(verbose_name='text')
     cooking_time = models.PositiveSmallIntegerField(
-        null=False,
-        blank=False,
         db_index=True,
         validators=[
             MinValueValidator(1, 'Cooking time must be at least 1 minute!')
-        ]
+        ],
+        verbose_name='cooking_time'
     )
-    tags = models.ManyToManyField(Tag)
+    tags = models.ManyToManyField(Tag, verbose_name='tags')
     ingredients = models.ManyToManyField(
         Ingredient,
-        through='IngredientInRecipe'
+        through='IngredientInRecipe',
+        verbose_name='ingredients'
     )
 
     class Meta:
         ordering = ['-id']
+        verbose_name = 'Recipe'
+        verbose_name_plural = 'Recipes'
 
     def __str__(self):
         return f'{self.name} by {self.author}'
@@ -115,21 +106,20 @@ class IngredientInRecipe(models.Model):
     recipe = ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        blank=False,
-        null=False
+        verbose_name='recipe'
     )
     ingredient = ForeignKey(
         Ingredient,
         on_delete=models.DO_NOTHING,
-        blank=False,
-        null=False
+        verbose_name='ingredient'
     )
     amount = models.PositiveSmallIntegerField(
         null=True,
         blank=True,
         validators=[
             MinValueValidator(1, 'Ingredient amount must be at least 1!')
-        ]
+        ],
+        verbose_name='amount'
     )
 
     class Meta:
@@ -140,6 +130,8 @@ class IngredientInRecipe(models.Model):
             )
         ]
         ordering = ['id']
+        verbose_name = 'Ingredient in Recipe'
+        verbose_name_plural = 'Ingredients in Recipes'
 
     def __str__(self):
         return f'{self.recipe}: {self.ingredient} {self.amount}'
@@ -154,12 +146,14 @@ class RecipeFavorite(models.Model):
     """
     user = models.ForeignKey(
         User,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        verbose_name='user'
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='favorites'
+        related_name='favorites',
+        verbose_name='favorites'
     )
 
     class Meta:
@@ -170,6 +164,8 @@ class RecipeFavorite(models.Model):
             )
         ]
         ordering = ['-id']
+        verbose_name = 'Favorited Recipe'
+        verbose_name_plural = 'Favorited Recipes'
 
     def __str__(self):
         return f'{self.user}: {self.recipe.name}'
@@ -184,12 +180,14 @@ class RecipeInCart(models.Model):
     """
     user = models.ForeignKey(
         User,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        verbose_name='user'
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='in_cart'
+        related_name='in_cart',
+        verbose_name='in_cart'
     )
 
     class Meta:
@@ -200,6 +198,8 @@ class RecipeInCart(models.Model):
             )
         ]
         ordering = ['-id']
+        verbose_name = 'Recipe in Cart'
+        verbose_name_plural = 'Recipes in Cart'
 
     def __str__(self):
         return f'{self.user}: {self.recipe.name}'

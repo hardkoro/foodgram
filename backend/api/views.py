@@ -1,8 +1,6 @@
-from rest_framework import status, viewsets
+from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
 from .exports import export_shopping_list_to_pdf
 from .filters import IngredientNameSearchFilter, RecipeAuthorAndTagFilter
@@ -10,13 +8,8 @@ from .models import (Ingredient, IngredientInRecipe, Recipe, RecipeFavorite,
                      RecipeInCart, Tag)
 from .pagination import LimitPageNumberPagination
 from .permissions import IsAdminOrAuthorOrReadOnly, IsAdminOrReadOnly
-from .serializers import (IngredientSerializer, RecipeSerializer,
-                          RecipeShortSerializer, TagSerializer)
-
-ERROR_OBJECT_EXISTS = 'Can\'t add recipe to {model_name} twice!'
-ERROR_NO_OBJECT = (
-    'Can\'t remove recipe from {model_name} because it is not in {model_name}!'
-)
+from .serializers import IngredientSerializer, RecipeSerializer, TagSerializer
+from .utils import get_or_delete_recipe_submodel_object
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -84,42 +77,3 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (IsAdminOrReadOnly, )
-
-
-def get_or_delete_recipe_submodel_object(model, request, pk):
-    """
-    GET or DELETE requests handlers for Recipe sub-model Model
-    (e.g. RecipeFavorite or RecipeInCart)
-    """
-    user, recipe = request.user, get_object_or_404(Recipe, pk=pk)
-    object = model.objects.filter(user=user, recipe=recipe)
-
-    if request.method == 'GET':
-        if object.exists():
-            return Response(
-                data={
-                    'errors': ERROR_OBJECT_EXISTS.format(
-                        model_name=model.__name__
-                    )
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        object = model.objects.create(user=user, recipe=recipe)
-        serializer = RecipeShortSerializer(
-            recipe, context={'request': request}
-        )
-        return Response(
-            data=serializer.data,
-            status=status.HTTP_201_CREATED
-        )
-    if not object:
-        return Response(
-            data={
-                'errors': ERROR_NO_OBJECT.format(
-                    model_name=model.__name__
-                )
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    object.delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
