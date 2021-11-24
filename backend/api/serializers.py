@@ -80,15 +80,14 @@ class RecipeSerializer(serializers.ModelSerializer):
             'name', 'image', 'text', 'cooking_time', 'id', 'ingredients'
         )
 
-    def validate(self, attrs):
-        ingredients = self.initial_data.get('ingredients')
-        if not ingredients:
+    def validate_ingredients(self, data):
+        if not data:
             raise serializers.ValidationError(
                 {'ingredients': NO_INGREDIENTS_ERROR}
             )
 
         valid_ingredients = []
-        for item in ingredients:
+        for item in data:
             ingredient = get_object_or_404(
                 Ingredient, id=item['id']
             )
@@ -101,26 +100,24 @@ class RecipeSerializer(serializers.ModelSerializer):
                     {'ingredients': WRONG_INGREDIENT_AMOUNT}
                 )
             valid_ingredients.append(ingredient)
-        attrs['ingredients'] = ingredients
+        return data
 
-        tags = self.initial_data.get('tags')
+    def validate_tags(self, data):
         valid_tags = []
-        for tag in tags:
+        for tag in data:
             if tag in valid_tags:
                 raise serializers.ValidationError(
                     {'tags': TAG_EXISTS}
                 )
             valid_tags.append(tag)
-        attrs['tags'] = tags
+        return data
 
-        cooking_time = self.initial_data.get('cooking_time')
-        if not (int(cooking_time) > 0):
+    def validate_cooking_time(self, data):
+        if not (int(data) > 0):
             raise serializers.ValidationError(
                 {'cooking_time': WRONG_COOKING_TIME}
             )
-        attrs['cooking_time'] = cooking_time
-
-        return attrs
+        return data
 
     def add_ingredients(self, recipe, ingredients):
         for item in ingredients:
