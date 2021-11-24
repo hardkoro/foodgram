@@ -134,19 +134,19 @@ class RecipeSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
-        tags = self.initial_data.get('tags')
+        tags = validated_data.pop('tags')
         recipe.tags.set(tags)
         self.add_ingredients(recipe, ingredients)
         return recipe
 
-    def update(self, instance, validated_data):
-        IngredientInRecipe.objects.filter(recipe=instance).delete()
-        ingredients = validated_data.get('ingredients')
-        self.add_ingredients(instance, ingredients)
-        instance.tags.clear()
-        tags = self.initial_data.get('tags')
-        instance.tags.set(tags)
-        return super().update(instance, validated_data)
+    def update(self, recipe, validated_data):
+        IngredientInRecipe.objects.filter(recipe=recipe).delete()
+        ingredients = validated_data.pop('ingredients')
+        self.add_ingredients(recipe, ingredients)
+        recipe.tags.clear()
+        tags = validated_data.pop('tags')
+        recipe.tags.set(tags)
+        return super().update(recipe, validated_data)
 
 
 class RecipeShortSerializer(serializers.ModelSerializer):
