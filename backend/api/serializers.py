@@ -8,10 +8,8 @@ from users.models import Follow
 from users.serializers import CustomUserSerializer
 
 NO_INGREDIENTS_ERROR = 'Can\'t add Recipe without Ingredients!'
-INGREDIENT_EXISTS = 'Can\'t add the same Ingredient twice!'
-WRONG_INGREDIENT_AMOUNT = 'Ingredient amount must be greater than zero!'
-TAG_EXISTS = 'Can\'t add the same Tag twice!'
-WRONG_COOKING_TIME = 'Cooking time must be greater than zero!'
+OBJECT_EXISTS = 'Can\'t add the same {object_name} twice!'
+WRONG_NUMERICAL_VALUE = '{value_name} must be greater than zero!'
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -83,7 +81,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate_ingredients(self, data):
         if not data:
             raise serializers.ValidationError(
-                {'ingredients': NO_INGREDIENTS_ERROR}
+                {'ingredients': OBJECT_EXISTS.format(object_name='Ingredient')}
             )
 
         valid_ingredients = []
@@ -93,11 +91,15 @@ class RecipeSerializer(serializers.ModelSerializer):
             )
             if ingredient in valid_ingredients:
                 raise serializers.ValidationError(
-                    {'ingredients': INGREDIENT_EXISTS}
+                    {'ingredients': OBJECT_EXISTS.format(
+                        object_name='Ingredient'
+                    )}
                 )
             if not int(ingredient['amount'] > 0):
                 raise serializers.ValidationError(
-                    {'ingredients': WRONG_INGREDIENT_AMOUNT}
+                    {'ingredients': WRONG_NUMERICAL_VALUE(
+                        value_name='Ingredient amount'
+                    )}
                 )
             valid_ingredients.append(ingredient)
         return data
@@ -107,7 +109,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         for tag in data:
             if tag in valid_tags:
                 raise serializers.ValidationError(
-                    {'tags': TAG_EXISTS}
+                    {'tags': OBJECT_EXISTS.format(object_name='Tag')}
                 )
             valid_tags.append(tag)
         return data
@@ -115,7 +117,9 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate_cooking_time(self, data):
         if not (int(data) > 0):
             raise serializers.ValidationError(
-                {'cooking_time': WRONG_COOKING_TIME}
+                {'cooking_time': WRONG_NUMERICAL_VALUE(
+                    value_name='Cooking time'
+                )}
             )
         return data
 
