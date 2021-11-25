@@ -102,7 +102,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
 
     'DEFAULT_FILTER_BACKENDS': [
@@ -123,8 +123,8 @@ DJOSER = {
     },
     'HIDE_USERS': False,
     'PERMISSIONS': {
-        'user': ('rest_framework.permissions.IsAuthenticated', ),
-        'user_list': ('rest_framework.permissions.AllowAny', )
+        'user': ('djoser.permissions.CurrentUserOrAdminOrReadOnly', ),
+        'user_list': ('djoser.permissions.CurrentUserOrAdminOrReadOnly', )
     }
 }
 
