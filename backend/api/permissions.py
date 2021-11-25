@@ -9,7 +9,7 @@ class IsAdminOrReadOnly(BasePermission):
             return True
         if request.user.is_anonymous:
             return False
-        return request.user.is_admin | request.user.is_superuser
+        return request.user.is_staff | request.user.is_superuser
 
 
 class IsAdminOrAuthorOrReadOnly(BasePermission):
@@ -25,4 +25,4 @@ class IsAdminOrAuthorOrReadOnly(BasePermission):
             return True
         if request.user.is_anonymous:
             return False
-        return (request.user == obj.author or request.user.is_admin)
+        return (request.user == obj.author or request.user.is_staff)
