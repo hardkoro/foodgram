@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django_filters.rest_framework import FilterSet, filters
 from rest_framework.filters import SearchFilter
 
-from .models import Recipe, Tag
+from .models import Recipe
 
 User = get_user_model()
 
@@ -13,9 +13,7 @@ class IngredientNameSearchFilter(SearchFilter):
 
 class RecipeAuthorAndTagFilter(FilterSet):
     tags = filters.AllValuesMultipleFilter(
-        field_name='tags__slug',
-        to_field_name='slug',
-        queryset=Tag.objects.all()
+        field_name='tags__slug'
     )
     author = filters.ModelChoiceFilter(
         queryset=User.objects.all()
