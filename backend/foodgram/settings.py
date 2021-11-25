@@ -121,6 +121,11 @@ DJOSER = {
         'user': 'users.serializers.CustomUserSerializer',
         'current_user': 'users.serializers.CustomUserSerializer',
     },
+    'HIDE_USERS': False,
+    'PERMISSIONS': {
+        'user': ('rest_framework.permissions.IsAuthenticated', ),
+        'user_list': ('rest_framework.permissions.AllowAny', )
+    }
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
