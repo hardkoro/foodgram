@@ -78,14 +78,14 @@ class RecipeSerializer(serializers.ModelSerializer):
             'name', 'image', 'text', 'cooking_time', 'id', 'ingredients'
         )
 
-    def validate_ingredients(self, data):
-        if not data:
+    def validate(self, attrs):
+        ingredients = self.initial_data.get('ingredients')
+        if not ingredients:
             raise serializers.ValidationError(
                 {'ingredients': OBJECT_EXISTS.format(object_name='Ingredient')}
             )
-
         valid_ingredients = []
-        for item in data:
+        for item in ingredients:
             ingredient = get_object_or_404(
                 Ingredient, id=item['id']
             )
@@ -95,24 +95,24 @@ class RecipeSerializer(serializers.ModelSerializer):
                         object_name='Ingredient'
                     )}
                 )
-            if not int(ingredient['amount'] > 0):
+            if int(item['amount']) <= 0:
                 raise serializers.ValidationError(
-                    {'ingredients': WRONG_NUMERICAL_VALUE(
+                    {'ingredients': WRONG_NUMERICAL_VALUE.format(
                         value_name='Ingredient amount'
                     )}
                 )
             valid_ingredients.append(ingredient)
-        return data
+        attrs['ingredients'] = ingredients
 
-    def validate_tags(self, data):
+        tags = self.initial_data.get('tags')
         valid_tags = []
-        for tag in data:
+        for tag in tags:
             if tag in valid_tags:
                 raise serializers.ValidationError(
                     {'tags': OBJECT_EXISTS.format(object_name='Tag')}
                 )
             valid_tags.append(tag)
-        return data
+        attrs['tags'] = tags
 
     def validate_cooking_time(self, data):
         if not (int(data) > 0):
@@ -133,7 +133,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             )
 
     def create(self, validated_data):
-        print(self.initial_data)
         ingredients = self.initial_data.get('ingredients')
         recipe = Recipe.objects.create(**validated_data)
         tags = self.initial_data.get('tags')
