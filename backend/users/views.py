@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api.pagination import LimitPageNumberPagination
+from api.permissions import IsAdminOrAuthorOrReadOnly
 from api.serializers import FollowSerializer
 from users.models import Follow
 
@@ -20,6 +21,7 @@ ERROR_NO_SUBSCRIPTION = (
 
 
 class CustomUserViewSet(UserViewSet):
+    permission_classes = (IsAdminOrAuthorOrReadOnly, )
     pagination_class = LimitPageNumberPagination
 
     @action(
