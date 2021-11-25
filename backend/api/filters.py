@@ -12,7 +12,11 @@ class IngredientNameSearchFilter(SearchFilter):
 
 
 class RecipeAuthorAndTagFilter(FilterSet):
-    tags = filters.AllValuesMultipleFilter(field_name='tags__slug')
+    tags = filters.AllValuesMultipleFilter(
+        field_name='tags__slug',
+        to_field_name='slug',
+        queryset=Tag.objects.all()
+    )
     author = filters.ModelChoiceFilter(
         queryset=User.objects.all()
     )
