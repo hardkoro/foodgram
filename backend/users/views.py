@@ -21,7 +21,6 @@ ERROR_NO_SUBSCRIPTION = (
 
 
 class CustomUserViewSet(UserViewSet):
-    permission_classes = (IsAdminOrReadOnly, )
     pagination_class = LimitPageNumberPagination
 
     @action(
