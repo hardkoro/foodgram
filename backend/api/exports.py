@@ -10,16 +10,21 @@ FILE_HEADER = 'Shopping List'
 
 FONT_NAME = 'Verdana'
 ITEMS_PER_PAGE = 35
+PAGE_HEIGHT = 770
 
 
 def export_shopping_list_to_pdf(data):
+
+    def prepare_new_page(pdf):
+        pdf.setFont(FONT_NAME, 12)
+        return PAGE_HEIGHT
+
     buffer = BytesIO()
     pdf = canvas.Canvas(buffer)
     registerFont(TTFont(FONT_NAME, f'{FONT_NAME}.ttf'))
     pdf.setFont(FONT_NAME, 16)
     pdf.drawString(250, 800, FILE_HEADER)
-    height = 790
-    pdf.setFont(FONT_NAME, 12)
+    height = prepare_new_page(pdf)
     for i, (item, data) in enumerate(data.items(), 1):
         pdf.drawString(
             50, height,
@@ -28,7 +33,7 @@ def export_shopping_list_to_pdf(data):
         height -= 20
         if i % ITEMS_PER_PAGE == 0:
             pdf.showPage()
-            height = 790
+            height = prepare_new_page(pdf)
     pdf.showPage()
     pdf.save()
     buffer.seek(0)
