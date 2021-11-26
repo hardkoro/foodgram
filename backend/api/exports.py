@@ -9,6 +9,7 @@ FILE_NAME = 'shopping_cart.pdf'
 FILE_HEADER = 'Shopping List'
 
 FONT_NAME = 'Verdana'
+ITEMS_PER_PAGE = 35
 
 
 def export_shopping_list_to_pdf(data):
@@ -24,6 +25,8 @@ def export_shopping_list_to_pdf(data):
             50, item_start_height - 20 * i,
             f"• {item} ({data['measurement_unit']}) — {data['amount']}"
         )
+        if i % ITEMS_PER_PAGE == 0:
+            pdf.showPage()
     pdf.showPage()
     pdf.save()
     buffer.seek(0)
