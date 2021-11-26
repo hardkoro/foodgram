@@ -19,7 +19,7 @@ class Tag(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
-        super()
+        super(Tag, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ['-id']
