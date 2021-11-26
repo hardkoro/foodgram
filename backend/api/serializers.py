@@ -102,7 +102,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                     )}
                 )
             valid_ingredients.append(ingredient)
-        attrs['ingredients'] = ingredients
 
         tags = self.initial_data.get('tags')
         valid_tags = []
@@ -112,7 +111,8 @@ class RecipeSerializer(serializers.ModelSerializer):
                     {'tags': OBJECT_EXISTS.format(object_name='Tag')}
                 )
             valid_tags.append(tag)
-        attrs['tags'] = tags
+
+        return attrs
 
     def validate_cooking_time(self, data):
         if not (int(data) > 0):
