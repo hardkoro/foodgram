@@ -18,15 +18,17 @@ def export_shopping_list_to_pdf(data):
     registerFont(TTFont(FONT_NAME, f'{FONT_NAME}.ttf'))
     pdf.setFont(FONT_NAME, 16)
     pdf.drawString(250, 800, FILE_HEADER)
-    item_start_height = 790
+    height = 790
     pdf.setFont(FONT_NAME, 12)
     for i, (item, data) in enumerate(data.items(), 1):
         pdf.drawString(
-            50, item_start_height - 20 * i - ITEMS_PER_PAGE // i,
+            50, height,
             f"• {item} ({data['measurement_unit']}) — {data['amount']}"
         )
+        height -= 20
         if i % ITEMS_PER_PAGE == 0:
             pdf.showPage()
+            height = 790
     pdf.showPage()
     pdf.save()
     buffer.seek(0)
