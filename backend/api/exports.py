@@ -27,6 +27,8 @@ def export_shopping_list_to_pdf(data):
         )
         if i % ITEMS_PER_PAGE == 0:
             pdf.showPage()
+            item_start_height = 790
+            pdf.setFont(FONT_NAME, 12)
     pdf.showPage()
     pdf.save()
     buffer.seek(0)
