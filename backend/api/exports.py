@@ -22,13 +22,11 @@ def export_shopping_list_to_pdf(data):
     pdf.setFont(FONT_NAME, 12)
     for i, (item, data) in enumerate(data.items(), 1):
         pdf.drawString(
-            50, item_start_height - 20 * i,
+            50, item_start_height - 20 * i - ITEMS_PER_PAGE // i,
             f"• {item} ({data['measurement_unit']}) — {data['amount']}"
         )
         if i % ITEMS_PER_PAGE == 0:
             pdf.showPage()
-            item_start_height = 790
-            pdf.setFont(FONT_NAME, 12)
     pdf.showPage()
     pdf.save()
     buffer.seek(0)
