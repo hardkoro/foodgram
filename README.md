@@ -1,4 +1,4 @@
-# Foodgram [![Django-app workflow](https://github.com/hardkoro/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg?branch=master)](https://github.com/hardkoro/foodgram-project-react/actions/workflows/foodgram_workflow.yml)
+# Foodgram [![Django-app workflow](https://github.com/hardkoro/foodgram/actions/workflows/foodgram_workflow.yml/badge.svg?branch=master)](https://github.com/hardkoro/foodgram/actions/workflows/foodgram_workflow.yml)
 
 ## Description
 
@@ -35,11 +35,11 @@ Available at: [http://51.250.19.115/](http://51.250.19.115/)
 - Clone the repo and change directory to the cloned repo:
 
   ```bash
-  git clone https://github.com/hardkoro/foodgram-project-react.git
+  git clone https://github.com/hardkoro/foodgram.git
   ```
 
   ```bash
-  cd foodgram-project-react
+  cd foodgram
   ```
 
 - Log in to the remote Ubuntu service
