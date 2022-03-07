@@ -8,7 +8,7 @@ Service contains an API that allows to retrieve or to update service data.
 
 Application is made on Django REST Framework, deployed on Nginx-server with Docker containerization technologies. GitHub Actions are used for Continuous Integration.
 
-Available at: [http://51.250.19.115/](http://51.250.19.115/)
+<!--Available at: [http://51.250.19.115/](http://51.250.19.115/)-->
 
 ## Technology Stack
 
